@@ -1,0 +1,126 @@
+Routing
+Routes are nothing but hashmap which is key and value pair
+
+First it is necessary to create multiple pages
+after dat we need to add classes to each dart file
+The main.dar file will be used for the routes where we will import each file of the pages
+Next we need to return a widget tree from each of the dart files dat we have written in main.dart
+Here in home.dart we have a button when pressed will navigate to loactionfile by using  Navigator.pushNamed(context,'/location');
+in the the on press button.The only issue in this is dat the original screen which is present is pushed down and another screent is displayed
+It does all the work of adding a back button onto ur app
+Routing is just like stack where each screen is an object and we push another screen onto the old one
+it is same as pushing an object onto the stack.The old screen sits down the new one
+When we press the back button then we will pop the route right off the stack and then we see the old  route or the initial route back again
+If there are multiple routes in a stack then it can cause an issue because in our case we can push home screen then the loacation then contacts and soo on and when we need to go back to the home screen it can cause issue
+
+
+
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------
+stateless widget build functions runs only once
+statefull widget the setState widget triggers the build function
+initState() it is only called once for initialising the widget
+Build() it builds a widget tree
+Dispose() when widget is removed
+
+first init is called the build
+
+when ever we click on a button and change its state by incrementing a value of integer but when ever we run the init will not be called again insted only the build function will be called
+
+
+-----------------------------------------------------------------------------------------------------------------------------
+Asynchronous code is the code which represents an action dat starts now and finishes some tym later eg promises of js
+It should be non blocking our code should run
+
+
+
+
+
+
+//    //simulate  network  request  for a username
+//    String username = await Future.delayed(Duration(seconds: 3),(){
+//      return('hello');
+//    });
+//
+//    String bio = await Future.delayed(Duration(seconds: 2),(){
+//      return('hello with 2 sec');
+//    });
+//
+//    print('$username - $bio');
+
+Response response = await get('https://jsonplaceholder.typicode.com/todos/1');
+//    print(response.body);
+    //this returns some output which looks like map but is a string becaouse we cannot access its userId as a parameter
+    //we can use jsondecode
+    Map data = jsonDecode(response.body);
+    print(data);
+    print(data['title']);
+
+
+yet we have used 2 packages those are http that is used to access the data from any json url
+and another pacakge dat we are using is Intl dat is used to access in formatting data
+flutter spin kit is another package dat we use  for spinners
+
+
+
+
+
+//initial loading.dart
+import 'package:flutter/material.dart';
+import 'package:world_time/services/world_time.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+
+
+class Loading extends StatefulWidget {
+  @override
+  _LoadingState createState() => _LoadingState();
+}
+
+class _LoadingState extends State<Loading> {
+
+  void setupWorldTime() async{
+        WorldTime instance = WorldTime(location: 'Berlin',flag: 'germany.png',url: 'Europe/Berlin');
+        await instance.getTime();
+        //here get time is an asynch function so it will not wait and willl try to print the time before it has fetched it so it is necessary
+        // to put an await before accessing instance.getTime() but it will show u an error becouse ur getTime retruns nothing as output it return void
+        //if we want to use await we need to use future<void> bit same as js promises
+
+        //here what we did is that we add home page onto the stack
+        //    Navigator.pushNamed(context, '/home');
+        // instead of dis we need to put
+        Navigator.pushReplacementNamed(context,'/home',arguments: {
+            //It is a map ie key value pair ie location flag and time
+            'location':instance.location,
+            'flag':instance.flag,
+            'time':instance.time,
+            'isDayTime':instance.isDaytime,
+        });
+
+  }
+
+  int counter = 0;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    setupWorldTime();
+
+  }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        backgroundColor: Colors.blue[900],
+      body: Center(
+          child:SpinKitRing(
+              color: Colors.white,
+              size:50.0,
+          ),
+      ),
+    );
+  }
+}
+
